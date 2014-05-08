@@ -1,3 +1,7 @@
+%%
+%% Xiyang Modification
+%% 5.8.2014 add log loss
+%%
 function nn = nnbp(nn)
 %NNBP performs backpropagation
 % nn = nnbp(nn) returns an neural network structure with updated weights 
@@ -9,6 +13,8 @@ function nn = nnbp(nn)
             d{n} = - nn.e .* (nn.a{n} .* (1 - nn.a{n}));
         case {'softmax','linear'}
             d{n} = - nn.e;
+		case 'logloss'
+            d{n} = - nn.e .* (nn.a{n} .* (1 - nn.a{n}));
     end
     for i = (n - 1) : -1 : 2
         % Derivative of the activation function

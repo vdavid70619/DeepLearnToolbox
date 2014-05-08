@@ -1,3 +1,7 @@
+%%
+%% Xiyang Modification
+%% 5.8.2014 add log loss
+%%
 function nn = nnff(nn, x, y)
 %NNFF performs a feedforward pass
 % nn = nnff(nn, x, y) returns an neural network structure with updated
@@ -46,6 +50,8 @@ function nn = nnff(nn, x, y)
             nn.a{n} = nn.a{n - 1} * nn.W{n - 1}';
             nn.a{n} = exp(bsxfun(@minus, nn.a{n}, max(nn.a{n},[],2)));
             nn.a{n} = bsxfun(@rdivide, nn.a{n}, sum(nn.a{n}, 2)); 
+		case 'logloss'
+            nn.a{n} = sigm(nn.a{n - 1} * nn.W{n - 1}');
     end
 
     %error and loss
@@ -56,5 +62,9 @@ function nn = nnff(nn, x, y)
             nn.L = 1/2 * sum(sum(nn.e .^ 2)) / m; 
         case 'softmax'
             nn.L = -sum(sum(y .* log(nn.a{n}))) / m;
+		case 'logloss'
+			epss=0.001; %arbitrary value, may be model tuning parameter  
+			y_pred=min(max(nn.a{n},epss),1-epss);
+			nn.L = -sum(sum(y .* log(y_pred) + (1-y) .* log(1-y_pred))) / m;
     end
 end
